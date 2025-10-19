@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+    id              String      @id
+    password        String     
+    secret          String
+}
+
+model Post {
+  id                String      @id @default(uuid())
+  title             String
+  createdAt         DateTime    @default(now())
+  layout            Json
+  categories        Category[]  @relation("PostCategories")
+  tags              Tag[]       @relation("PostTags")
+  comments          Comment[]
+  published         Boolean     @default(false)
+  media             Media[]
+  views             PostView[]
+}
+
+model Comment {
+  id                String      @id @default(uuid()) 
+  author            String
+  authorEmail       String?
+  body              String          
+  createdAt         DateTime    @default(now())
+  post              Post        @relation(fields: [postId], references: [id])
+  postId            String
+}
+
+model Category {
+    id              String         @id @default(uuid())
+    name            String
+    post            Post[]         @relation("PostCategories")
+    postId          String
+}
+
+model Tag {
+    id              String         @id @default(uuid())
+    name            String
+    post            Post[]         @relation("PostTags")
+    postId          String
+}
+
+model Settings {
+    id              String          @id @default("singleton")
+    theme           String          @default("dark")
+    blogName        String          @default("sintopia")
+    defaultLanguage String          @default("english")
+}
+
+model Media {
+    id              String          @id @default(uuid())
+    filePath        String
+    mimeType        String
+    altText         String?
+    postId          String?
+    post            Post?           @relation(fields: [postId], references: [id])
+}
+
+model PostView {
+    id              String          @id @default(uuid())
+    postId          String
+    post            Post            @relation(fields: [postId], references: [id])
+    ipHash          String?
+    userAgent       String?
+    date            DateTime        @default(now())
+
+    @@index([postId])
+    @@index([date])
+}

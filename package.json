@@ -1,0 +1,29 @@
+{
+  "name": "odin-blog-api",
+  "version": "1.0.0",
+  "description": "The API for TheOdinProject's Blog project of the NodeJS section",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node app.js --watch",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CasuallyDreamin/odin-blog-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/CasuallyDreamin/odin-blog-api/issues"
+  },
+  "homepage": "https://github.com/CasuallyDreamin/odin-blog-api#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "prisma": "^6.17.1"
+  }
+}
