@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/CasuallyDreamin/odin-blog-api#readme",
   "dependencies": {
+    "@prisma/client": "^6.17.1",
+    "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "pg": "^8.16.3",

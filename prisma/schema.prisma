@@ -38,16 +38,14 @@ model Comment {
 
 model Category {
     id              String         @id @default(uuid())
-    name            String
+    name            String         @unique
     post            Post[]         @relation("PostCategories")
-    postId          String
 }
 
 model Tag {
     id              String         @id @default(uuid())
-    name            String
+    name            String         @unique
     post            Post[]         @relation("PostTags")
-    postId          String
 }
 
 model Settings {
