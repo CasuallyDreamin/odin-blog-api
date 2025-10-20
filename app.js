@@ -1,5 +1,6 @@
-import express from 'express';
+import express, { urlencoded } from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 import postRoutes from './routes/postRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
@@ -18,6 +19,7 @@ export const prisma = new PrismaClient();
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded());
 
 // Routes
 app.use("/api/posts", postRoutes);
