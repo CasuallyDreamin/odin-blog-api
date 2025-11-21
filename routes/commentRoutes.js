@@ -4,7 +4,7 @@ import { getComments, getCommentById, createComment } from "../controllers/comme
 const router = express.Router();
 
 router.get("/", getComments);
-router.get("/:id", getCommentById);
+router.get("/:slug", getCommentById);
 router.post("/", createComment);
 
 export default router;

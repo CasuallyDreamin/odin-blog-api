@@ -4,7 +4,7 @@ import { getAllTags, getTagById, createTag } from "../controllers/tagController.
 const router = express.Router();
 
 router.get("/", getAllTags);
-router.get("/:id", getTagById);
+router.get("/:slug", getTagById);
 router.post("/", createTag);
 
 export default router;

@@ -6,13 +6,18 @@ let testPostId, testCategoryId, testTagId, testMediaId, testCommentId, testPostV
 
 describe("Sintopia API", () => {
   afterAll(async () => {
-    if (testPostViewId) await prisma.postView.delete({ where: { id: testPostViewId } });
-    if (testMediaId) await prisma.media.delete({ where: { id: testMediaId } });
-    if (testCommentId) await prisma.comment.delete({ where: { id: testCommentId } });
-    if (testPostId) await prisma.post.delete({ where: { id: testPostId } });
-    if (testCategoryId) await prisma.category.delete({ where: { id: testCategoryId } });
-    if (testTagId) await prisma.tag.delete({ where: { id: testTagId } });
-    await prisma.$disconnect();
+    try {
+      if (testPostViewId) await prisma.postView.delete({ where: { id: testPostViewId } });
+      if (testMediaId) await prisma.media.delete({ where: { id: testMediaId } });
+      if (testCommentId) await prisma.comment.delete({ where: { id: testCommentId } });
+      if (testPostId) await prisma.post.delete({ where: { id: testPostId } });
+      if (testCategoryId) await prisma.category.delete({ where: { id: testCategoryId } });
+      if (testTagId) await prisma.tag.delete({ where: { id: testTagId } });
+    } catch (err) {
+      console.warn("CLEAN UP FAILURE:", err.message)
+    } finally {
+      await prisma.$disconnect();
+    }
   });
 
   it("should create a category", async () => {

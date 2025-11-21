@@ -1,6 +1,5 @@
-import express, { urlencoded } from 'express';
+import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
 
 import postRoutes from './routes/postRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
@@ -9,7 +8,7 @@ import mediaRoutes from './routes/mediaRoutes.js';
 import postViewRoutes from './routes/postViewRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import tagRoutes from './routes/tagRoutes.js';
-
+import cors from "cors";
 import { PrismaClient } from '@prisma/client';
 
 dotenv.config();
@@ -19,16 +18,17 @@ export const prisma = new PrismaClient();
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true}));
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:3001']}));
 
 // Routes
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
-app.use("/api/categories", categoryRoutes)
-app.use("/api/medias", mediaRoutes)
-app.use("/api/postViews", postViewRoutes)
-app.use("/api/settings",settingsRoutes)
-app.use("/api/tags", tagRoutes)
+app.use("/api/categories", categoryRoutes);
+app.use("/api/medias", mediaRoutes);
+app.use("/api/postViews", postViewRoutes);
+app.use("/api/settings",settingsRoutes);
+app.use("/api/tags", tagRoutes);
 
 // Health check
 app.get("/", (req, res) => {

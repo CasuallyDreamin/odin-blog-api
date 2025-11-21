@@ -16,6 +16,7 @@ model Admin {
 model Post {
   id                String      @id @default(uuid())
   title             String
+  slug              String      @unique
   createdAt         DateTime    @default(now())
   layout            Json
   categories        Category[]  @relation("PostCategories")
