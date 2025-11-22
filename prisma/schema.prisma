@@ -33,7 +33,7 @@ model Comment {
   authorEmail       String?
   body              String          
   createdAt         DateTime    @default(now())
-  post              Post        @relation(fields: [postId], references: [id])
+  post              Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId            String
 }
 
@@ -62,13 +62,13 @@ model Media {
     mimeType        String
     altText         String?
     postId          String?
-    post            Post?           @relation(fields: [postId], references: [id])
+    post            Post?           @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model PostView {
     id              String          @id @default(uuid())
     postId          String
-    post            Post            @relation(fields: [postId], references: [id])
+    post            Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
     ipHash          String?
     userAgent       String?
     date            DateTime        @default(now())

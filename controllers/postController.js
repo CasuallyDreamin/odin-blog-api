@@ -84,8 +84,29 @@ function slugify(text) {
 
 export const createPost = async (req, res, next) => {
   try {
-    const { title, layout, published, categoryIds = [], tagIds = [] } = req.body;
-    const slug = slugify(title);
+    const { 
+      title, 
+      layout = {}, 
+      published = false, 
+      categoryIds = [], 
+      tagIds = [] 
+    } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ error: "Title is required" });
+    }
+
+    const baseSlug = slugify(title);
+    let slug = baseSlug;
+
+    let existing = await prisma.post.findUnique({ where: { slug } });
+    let counter = 1;
+
+    while (existing) {
+      slug = `${baseSlug}-${counter}`;
+      existing = await prisma.post.findUnique({ where: { slug } });
+      counter++;
+    }
 
     const post = await prisma.post.create({
       data: {
@@ -93,14 +114,27 @@ export const createPost = async (req, res, next) => {
         slug,
         layout,
         published,
-        categories: { connect: categoryIds.map(id => ({ id })) },
-        tags: { connect: tagIds.map(id => ({ id })) },
+        categories: {
+          connect: categoryIds.map((id) => ({ id }))
+        },
+        tags: {
+          connect: tagIds.map((id) => ({ id }))
+        }
       },
-      include: { categories: true, tags: true, comments: true, media: true, views: true },
+      include: {
+        categories: true,
+        tags: true,
+        comments: true,
+        media: true,
+        views: true
+      }
     });
-    res.status(201).json(post);
+
+    return res.status(201).json(post);
+
   } catch (err) {
-    next(err);
+    console.error(err);
+    return next(err);
   }
 };
 
