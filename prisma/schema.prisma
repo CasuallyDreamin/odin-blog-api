@@ -17,8 +17,8 @@ model Post {
   id                String      @id @default(uuid())
   title             String
   slug              String      @unique
+  content           String      @default("")
   createdAt         DateTime    @default(now())
-  layout            Json
   categories        Category[]  @relation("PostCategories")
   tags              Tag[]       @relation("PostTags")
   comments          Comment[]
@@ -40,13 +40,13 @@ model Comment {
 model Category {
     id              String         @id @default(uuid())
     name            String         @unique
-    post            Post[]         @relation("PostCategories")
+    posts            Post[]         @relation("PostCategories")
 }
 
 model Tag {
     id              String         @id @default(uuid())
     name            String         @unique
-    post            Post[]         @relation("PostTags")
+    posts            Post[]         @relation("PostTags")
 }
 
 model Settings {

@@ -1,15 +1,42 @@
 import { prisma } from "../app.js";
+import { sanitizeHtml } from '../utils/sanitize.js'; 
+
+function slugify(text) {
+  return text.toLowerCase().trim().replace(/[\s\W-]+/g, '-')
+}
+
+// Function to find a unique slug, handling conflicts
+async function findUniqueSlug(title, currentId = null) {
+  const baseSlug = slugify(title);
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existing = await prisma.post.findUnique({ where: { slug } });
+
+    if (!existing) {
+      return slug;
+    }
+
+    // If the existing post is the one we are currently updating, the slug is still unique for this post.
+    if (existing.id === currentId) {
+      return slug;
+    }
+    
+    // If the existing post is a different post, try a new slug.
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+}
 
 export const getPosts = async (req, res, next) => {
   try {
     const { category, tag, search, page = 1, limit = 10, sort = "desc" } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Support multiple categories/tags as comma-separated values
     const categoryList = category ? category.split(',').map(c => c.trim()) : [];
     const tagList = tag ? tag.split(',').map(t => t.trim()) : [];
 
-    // Build filter
     const filters = {
       published: true,
       AND: [
@@ -20,7 +47,12 @@ export const getPosts = async (req, res, next) => {
           ? { tags: { some: { name: { in: tagList } } } }
           : {},
         search
-          ? { title: { contains: search, mode: "insensitive" } }
+          ? { 
+              OR: [
+                  { title: { contains: search, mode: "insensitive" } },
+                  { content: { contains: search, mode: "insensitive" } },
+              ],
+            }
           : {},
       ],
     };
@@ -78,41 +110,30 @@ export const getPostBySlug = async (req, res, next) => {
   }
 };
 
-function slugify(text) {
-  return text.toLowerCase().trim().replace(/[\s\W-]+/g, '-')
-}
-
 export const createPost = async (req, res, next) => {
   try {
     const { 
       title, 
-      layout = {}, 
+      content,
       published = false, 
       categoryIds = [], 
       tagIds = [] 
     } = req.body;
 
-    if (!title) {
-      return res.status(400).json({ error: "Title is required" });
+    if (!title || !content) {
+      return res.status(400).json({ error: "Title and content are required" });
     }
 
-    const baseSlug = slugify(title);
-    let slug = baseSlug;
+    const safeContent = sanitizeHtml(content);
 
-    let existing = await prisma.post.findUnique({ where: { slug } });
-    let counter = 1;
-
-    while (existing) {
-      slug = `${baseSlug}-${counter}`;
-      existing = await prisma.post.findUnique({ where: { slug } });
-      counter++;
-    }
+    // Use the robust slug function for creation
+    const slug = await findUniqueSlug(title);
 
     const post = await prisma.post.create({
       data: {
         title,
         slug,
-        layout,
+        content: safeContent,
         published,
         categories: {
           connect: categoryIds.map((id) => ({ id }))
@@ -138,11 +159,65 @@ export const createPost = async (req, res, next) => {
   }
 };
 
+export const updatePost = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      content,
+      published,
+      categoryIds = [],
+      tagIds = [],
+    } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({ error: "Title and content are required for update" });
+    }
+
+    const postExists = await prisma.post.findUnique({ where: { id } });
+    if (!postExists) return res.status(404).json({ error: "Post not found" });
+
+    const safeContent = sanitizeHtml(content);
+
+    let newSlug = postExists.slug;
+    if (title !== postExists.title) {
+        newSlug = await findUniqueSlug(title, id);
+    }
+
+    const updateData = {
+        title,
+        slug: newSlug,
+        content: safeContent,
+        published: published,
+        categories: { set: categoryIds.map((id) => ({ id })) },
+        tags: { set: tagIds.map((id) => ({ id })) },
+    };
+
+    const updatedPost = await prisma.post.update({
+      where: { id },
+      data: updateData,
+      include: {
+        categories: true,
+        tags: true,
+        comments: true,
+        media: true,
+        views: true
+      }
+    });
+
+    return res.status(200).json(updatedPost);
+
+  } catch (err) {
+    console.error(err);
+    return next(err);
+  }
+};
+
+
 export const deletePost = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // Optional: check if post exists first
     const postExists = await prisma.post.findUnique({ where: { id } });
     if (!postExists) return res.status(404).json({ error: "Post not found" });
 

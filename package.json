@@ -24,8 +24,10 @@
     "@prisma/client": "^6.17.1",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
+    "dompurify": "^3.3.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "jsdom": "^27.2.0",
     "pg": "^8.16.3",
     "prisma": "^6.17.1"
   },
