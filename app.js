@@ -8,6 +8,10 @@ import mediaRoutes from './routes/mediaRoutes.js';
 import postViewRoutes from './routes/postViewRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import tagRoutes from './routes/tagRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
+import quoteRoutes from './routes/quoteRoutes.js';
+import archiveRoutes from './routes/archiveRoutes.js';
+
 import cors from "cors";
 import { PrismaClient } from '@prisma/client';
 
@@ -29,6 +33,9 @@ app.use("/api/medias", mediaRoutes);
 app.use("/api/postViews", postViewRoutes);
 app.use("/api/settings",settingsRoutes);
 app.use("/api/tags", tagRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/quotes", quoteRoutes);
+app.use("/api/archives", archiveRoutes);
 
 // Health check
 app.get("/", (req, res) => {

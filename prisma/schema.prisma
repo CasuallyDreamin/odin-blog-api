@@ -8,71 +8,105 @@ datasource db {
 }
 
 model Admin {
-    id              String      @id
-    password        String     
-    secret          String
+  id       String @id
+  password String
+  secret   String
 }
 
 model Post {
-  id                String      @id @default(uuid())
-  title             String
-  slug              String      @unique
-  content           String      @default("")
-  createdAt         DateTime    @default(now())
-  categories        Category[]  @relation("PostCategories")
-  tags              Tag[]       @relation("PostTags")
-  comments          Comment[]
-  published         Boolean     @default(false)
-  media             Media[]
-  views             PostView[]
+  id         String     @id @default(uuid())
+  title      String
+  slug       String     @unique
+  content    String     @default("")
+  createdAt  DateTime   @default(now())
+  categories Category[] @relation("PostCategories")
+  tags       Tag[]      @relation("PostTags")
+  comments   Comment[]
+  published  Boolean    @default(false)
+  media      Media[]
+  views      PostView[]
 }
 
 model Comment {
-  id                String      @id @default(uuid()) 
-  author            String
-  authorEmail       String?
-  body              String          
-  createdAt         DateTime    @default(now())
-  post              Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId            String
+  id          String   @id @default(uuid())
+  author      String
+  authorEmail String?
+  body        String
+  createdAt   DateTime @default(now())
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId      String
+  isApproved  Boolean  @default(false)
 }
 
 model Category {
-    id              String         @id @default(uuid())
-    name            String         @unique
-    posts            Post[]         @relation("PostCategories")
+  id       String    @id @default(uuid())
+  name     String    @unique
+  posts    Post[]    @relation("PostCategories")
+  projects Project[] @relation("ProjectCategories")
 }
 
 model Tag {
-    id              String         @id @default(uuid())
-    name            String         @unique
-    posts            Post[]         @relation("PostTags")
+  id       String    @id @default(uuid())
+  name     String    @unique
+  posts    Post[]    @relation("PostTags")
+  Projects Project[] @relation("ProjectTags")
+  Quotes   Quote[]   @relation("QuoteTags")
 }
 
 model Settings {
-    id              String          @id @default("singleton")
-    theme           String          @default("dark")
-    blogName        String          @default("sintopia")
-    defaultLanguage String          @default("english")
+  id             String   @id @unique @default("singleton")
+  blogName       String   @default("My Awesome Blog")
+  tagline        String   @default("The best place for news.")
+  logoUrl        String?
+  theme          String   @default("default")
+  postsPerPage   Int      @default(10)
+  seoTitle       String?
+  seoDescription String?
+  socialLinks    Json?
+  updatedAt      DateTime @default(now()) @updatedAt
+  createdAt      DateTime @default(now())
 }
 
 model Media {
-    id              String          @id @default(uuid())
-    filePath        String
-    mimeType        String
-    altText         String?
-    postId          String?
-    post            Post?           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  filePath  String
+  mimeType  String
+  altText   String?
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project? @relation("ProjectMedia", fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model PostView {
-    id              String          @id @default(uuid())
-    postId          String
-    post            Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
-    ipHash          String?
-    userAgent       String?
-    date            DateTime        @default(now())
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ipHash    String?
+  userAgent String?
+  date      DateTime @default(now())
 
-    @@index([postId])
-    @@index([date])
+  @@index([postId])
+  @@index([date])
+}
+
+model Project {
+  id          String     @id @default(uuid())
+  title       String
+  slug        String     @unique
+  description String?    @default("")
+  content     String?    @default("")
+  createdAt   DateTime   @default(now())
+  tags        Tag[]      @relation("ProjectTags")
+  categories  Category[] @relation("ProjectCategories")
+  published   Boolean    @default(false)
+  media       Media[]    @relation("ProjectMedia")
+}
+
+model Quote {
+  id        String   @id @default(uuid())
+  content   String
+  author    String?
+  createdAt DateTime @default(now())
+  tags      Tag[]    @relation("QuoteTags")
 }

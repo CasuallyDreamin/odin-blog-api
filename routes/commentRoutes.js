@@ -1,10 +1,17 @@
 import express from "express";
-import { getComments, getCommentById, createComment } from "../controllers/commentController.js";
+import { 
+  getAllComments,
+  deleteComment,
+  createComment,
+  setStatus
+} from "../controllers/commentController.js"; 
 
 const router = express.Router();
 
-router.get("/", getComments);
-router.get("/:slug", getCommentById);
 router.post("/", createComment);
+router.get("/", getAllComments); 
+router.delete("/:id", deleteComment); 
+router.put("/:id/status", setStatus);
 
 export default router;
+

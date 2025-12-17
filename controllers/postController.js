@@ -5,7 +5,6 @@ function slugify(text) {
   return text.toLowerCase().trim().replace(/[\s\W-]+/g, '-')
 }
 
-// Function to find a unique slug, handling conflicts
 async function findUniqueSlug(title, currentId = null) {
   const baseSlug = slugify(title);
   let slug = baseSlug;
@@ -18,12 +17,10 @@ async function findUniqueSlug(title, currentId = null) {
       return slug;
     }
 
-    // If the existing post is the one we are currently updating, the slug is still unique for this post.
     if (existing.id === currentId) {
       return slug;
     }
-    
-    // If the existing post is a different post, try a new slug.
+
     slug = `${baseSlug}-${counter}`;
     counter++;
   }
@@ -38,7 +35,6 @@ export const getPosts = async (req, res, next) => {
     const tagList = tag ? tag.split(',').map(t => t.trim()) : [];
 
     const filters = {
-      published: true,
       AND: [
         categoryList.length
           ? { categories: { some: { name: { in: categoryList } } } }
@@ -212,7 +208,6 @@ export const updatePost = async (req, res, next) => {
     return next(err);
   }
 };
-
 
 export const deletePost = async (req, res, next) => {
   try {
