@@ -4,7 +4,7 @@ import { getSettings, updateSettings } from "../controllers/settingsController.j
 
 const router = express.Router();
 
-router.get("/", requireAdmin,getSettings);
+router.get("/", getSettings);
 router.put("/", requireAdmin, updateSettings);
 
 export default router;
