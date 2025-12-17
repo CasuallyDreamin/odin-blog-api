@@ -1,4 +1,5 @@
 import express from 'express';
+import { requireAdmin } from '../middleware/auth.js';
 import {
   getProjects,
   getProjectBySlug,
@@ -11,8 +12,8 @@ const router = express.Router();
 
 router.get('/', getProjects);
 router.get('/:slug', getProjectBySlug);
-router.post('/', createProject);
-router.put('/:id', updateProject);
-router.delete('/:id', deleteProject);
+router.post('/', requireAdmin, createProject);
+router.put('/:id', requireAdmin, updateProject);
+router.delete('/:id', requireAdmin, deleteProject);
 
 export default router;

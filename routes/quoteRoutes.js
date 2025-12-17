@@ -1,4 +1,5 @@
 import express from 'express';
+import { requireAdmin } from '../middleware/auth.js';
 import {
   getQuotes,
   getQuoteById,
@@ -11,7 +12,7 @@ const router = express.Router();
 
 router.get('/', getQuotes);
 router.get('/:id', getQuoteById);
-router.post('/', createQuote);
+router.post('/', requireAdmin, createQuote);
 router.put('/:id', updateQuote);
 router.delete('/:id', deleteQuote);
 

@@ -1,4 +1,5 @@
 import express from "express";
+import { requireAdmin } from "../middleware/auth.js";
 import { 
   getAllCategories, 
   getCategoryById, 
@@ -11,8 +12,8 @@ const router = express.Router();
 
 router.get("/", getAllCategories);
 router.get("/:id", getCategoryById); 
-router.post("/", createCategory);
-router.put("/:id", updateCategory); 
-router.delete("/:id", deleteCategory); 
+router.post("/", requireAdmin, createCategory);
+router.put("/:id", requireAdmin,updateCategory); 
+router.delete("/:id", requireAdmin, deleteCategory); 
 
 export default router;
