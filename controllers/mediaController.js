@@ -1,4 +1,4 @@
-import { prisma } from "../app.js";
+import { prisma } from "../prisma/client.js";
 
 export const getAllMedia = async (req, res, next) => {
   try {

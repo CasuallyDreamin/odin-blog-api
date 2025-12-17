@@ -9,6 +9,7 @@ datasource db {
 
 model Admin {
   id       String @id
+  email    String @unique @default("")
   password String
   secret   String
 }

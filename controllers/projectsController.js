@@ -1,4 +1,4 @@
-import { prisma } from "../app.js";
+import { prisma } from "../prisma/client.js";
 import { sanitizeHtml } from '../utils/sanitize.js';
 
 function slugify(text) {
