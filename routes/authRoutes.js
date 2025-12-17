@@ -5,12 +5,7 @@ import { validate } from "../middleware/validate.js";
 const router = express.Router();
 
 router.post(
-  "/login",
-  validate({
-    email: "email|required",
-    password: "string|required",
-  }),
-  login
+  "/login", login
 );
 
 router.post("/logout", logout);
