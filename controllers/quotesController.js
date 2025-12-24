@@ -1,16 +1,15 @@
 import { prisma } from "../prisma/client.js";
 import { sanitizeHtml } from '../utils/sanitize.js';
-
 export const getQuotes = async (req, res, next) => {
   try {
-    const { tag, search, page = 1, limit = 10, sort = "desc" } = req.query;
+    const { category, search, page = 1, limit = 10, sort = "desc" } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const tagList = tag ? tag.split(',').map(t => t.trim()) : [];
+    const categoryList = category ? category.split(',').map(c => c.trim()) : [];
 
     const filters = {
       AND: [
-        tagList.length ? { tags: { some: { name: { in: tagList } } } } : {},
+        categoryList.length ? { categories: { some: { name: { in: categoryList } } } } : {},
         search ? { content: { contains: search, mode: "insensitive" } } : {},
       ],
     };
@@ -18,7 +17,7 @@ export const getQuotes = async (req, res, next) => {
     const [quotes, total] = await Promise.all([
       prisma.quote.findMany({
         where: filters,
-        include: { tags: true },
+        include: { categories: true }, // Include categories
         orderBy: { createdAt: sort.toLowerCase() === "asc" ? "asc" : "desc" },
         skip,
         take: parseInt(limit),
@@ -37,22 +36,9 @@ export const getQuotes = async (req, res, next) => {
   }
 };
 
-export const getQuoteById = async (req, res, next) => {
-  try {
-    const quote = await prisma.quote.findUnique({
-      where: { id: req.params.id },
-      include: { tags: true }
-    });
-    if (!quote) return res.status(404).json({ error: "Quote not found" });
-    res.json(quote);
-  } catch (err) {
-    next(err);
-  }
-};
-
 export const createQuote = async (req, res, next) => {
   try {
-    const { content, author = '', tagIds = [] } = req.body;
+    const { content, author = '', categoryIds = [] } = req.body;
     if (!content) return res.status(400).json({ error: "Quote content is required" });
 
     const safeContent = sanitizeHtml(content);
@@ -61,12 +47,24 @@ export const createQuote = async (req, res, next) => {
       data: {
         content: safeContent,
         author,
-        tags: { connect: tagIds.map(id => ({ id })) },
+        categories: { connect: categoryIds.map(id => ({ id })) }, // connect to categories
       },
-      include: { tags: true }
+      include: { categories: true }
     });
 
     res.status(201).json(quote);
+  } catch (err) {
+    next(err);
+  }
+};
+export const getQuoteById = async (req, res, next) => {
+  try {
+    const quote = await prisma.quote.findUnique({
+      where: { id: req.params.id },
+      include: { tags: true }
+    });
+    if (!quote) return res.status(404).json({ error: "Quote not found" });
+    res.json(quote);
   } catch (err) {
     next(err);
   }

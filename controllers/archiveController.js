@@ -8,6 +8,7 @@ function normalizePost(p) {
     url: `/posts/${p.slug}`,
     date: p.createdAt,
     tags: (p.tags || []).map(t => t.name),
+    categories: (p.categories || []).map(c => c.name),
     raw: p
   };
 }
@@ -20,6 +21,7 @@ function normalizeProject(p) {
     url: `/projects/${p.slug}`,
     date: p.createdAt,
     tags: (p.tags || []).map(t => t.name),
+    categories: (p.categories || []).map(c => c.name),
     raw: p
   };
 }
@@ -29,9 +31,10 @@ function normalizeQuote(q) {
     id: q.id,
     type: 'quote',
     title: q.content.length > 80 ? q.content.substring(0, 80) + '…' : q.content,
-    url: `/quotes/${q.id}`,
+    url: `/thoughts`, 
     date: q.createdAt,
-    tags: (q.tags || []).map(t => t.name),
+    tags: [], 
+    categories: (q.categories || []).map(c => c.name),
     raw: q
   };
 }
@@ -43,9 +46,27 @@ export const getArchive = async (req, res, next) => {
     const skip = (parseInt(page) - 1) * take;
 
     const [posts, projects, quotes] = await Promise.all([
-      prisma.post.findMany({ where: {}, include: { tags: true }, orderBy: { createdAt: 'desc' }, skip, take }),
-      prisma.project.findMany({ where: {}, include: { tags: true }, orderBy: { createdAt: 'desc' }, skip, take }),
-      prisma.quote.findMany({ where: {}, include: { tags: true }, orderBy: { createdAt: 'desc' }, skip, take })
+      prisma.post.findMany({ 
+        where: { published: true }, 
+        include: { tags: true, categories: true }, 
+        orderBy: { createdAt: 'desc' }, 
+        skip, 
+        take 
+      }),
+      prisma.project.findMany({ 
+        where: { published: true }, 
+        include: { tags: true, categories: true }, 
+        orderBy: { createdAt: 'desc' }, 
+        skip, 
+        take 
+      }),
+      prisma.quote.findMany({ 
+        where: {}, 
+        include: { categories: true }, 
+        orderBy: { createdAt: 'desc' }, 
+        skip, 
+        take 
+      })
     ]);
 
     const normalized = [

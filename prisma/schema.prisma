@@ -44,14 +44,21 @@ model Category {
   name     String    @unique
   posts    Post[]    @relation("PostCategories")
   projects Project[] @relation("ProjectCategories")
+  quotes   Quote[]   @relation("QuoteCategories")
 }
 
+model Quote {
+  id         String     @id @default(uuid())
+  content    String
+  author     String?
+  createdAt  DateTime   @default(now())
+  categories Category[] @relation("QuoteCategories")
+}
 model Tag {
   id       String    @id @default(uuid())
   name     String    @unique
   posts    Post[]    @relation("PostTags")
   Projects Project[] @relation("ProjectTags")
-  Quotes   Quote[]   @relation("QuoteTags")
 }
 
 model Settings {
@@ -104,10 +111,12 @@ model Project {
   media       Media[]    @relation("ProjectMedia")
 }
 
-model Quote {
+model ContactMessage {
   id        String   @id @default(uuid())
-  content   String
-  author    String?
+  name      String
+  email     String
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
-  tags      Tag[]    @relation("QuoteTags")
 }

@@ -13,6 +13,7 @@ import projectRoutes from './routes/projectRoutes.js';
 import quoteRoutes from './routes/quoteRoutes.js';
 import archiveRoutes from './routes/archiveRoutes.js';
 import authroutes from './routes/authRoutes.js';
+import messageRoutes from './routes/contactRoutes.js';
 
 import cors from "cors";
 
@@ -40,6 +41,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/quotes", quoteRoutes);
 app.use("/api/archives", archiveRoutes);
 app.use("/api/auth", authroutes);
+app.use("/api/contact", messageRoutes);
 // Health check
 app.get("/", (req, res) => {
     res.json({ message: "sintopia api is up and running!"});
