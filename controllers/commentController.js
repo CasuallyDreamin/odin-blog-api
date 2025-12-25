@@ -43,6 +43,17 @@ export const getAllComments = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+export const getPendingCommentsCount = async (req, res, next) => {
+  try {
+    const count = await prisma.comment.count({
+      where: { isApproved: false },
+    });
+    res.json({ pendingCount: count });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const getCommentById = async (req, res, next) => {
   try {
     const comment = await prisma.comment.findUnique({
