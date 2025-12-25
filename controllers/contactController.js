@@ -64,3 +64,14 @@ export const deleteMessage = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getUnreadCount = async (req, res, next) => {
+  try {
+    const count = await prisma.contactMessage.count({
+      where: { isRead: false }
+    });
+    res.json({ count: count });
+  } catch (err) {
+    next(err);
+  }
+};

@@ -3,7 +3,8 @@ import {
   submitMessage, 
   getMessages, 
   markAsRead, 
-  deleteMessage 
+  deleteMessage,
+  getUnreadCount 
 } from '../controllers/contactController.js';
 import { requireAdmin } from '../middleware/auth.js';
 
@@ -12,6 +13,8 @@ const router = express.Router();
 router.post('/', submitMessage);
 
 router.get('/', requireAdmin, getMessages);
+router.get('/unread/count', requireAdmin, getUnreadCount);
+
 router.patch('/:id/read', requireAdmin, markAsRead);
 router.delete('/:id', requireAdmin, deleteMessage);
 
