@@ -48,7 +48,7 @@ export const getPendingCommentsCount = async (req, res, next) => {
     const count = await prisma.comment.count({
       where: { isApproved: false },
     });
-    res.json({ pendingCount: count });
+    res.json({ count: count });
   } catch (err) {
     next(err);
   }
