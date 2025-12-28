@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node server.js --watch",
     "start": "node server.js",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "prod": "npx prisma migrate deploy && node server.js"
   },
   "repository": {
     "type": "git",

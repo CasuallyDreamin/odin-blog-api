@@ -42,9 +42,11 @@ app.use("/api/quotes", quoteRoutes);
 app.use("/api/archives", archiveRoutes);
 app.use("/api/auth", authroutes);
 app.use("/api/contact", messageRoutes);
+
 // Health check
-app.get("/", (req, res) => {
-    res.json({ message: "sintopia api is up and running!"});
+app.get("/api/", (req, res) => {
+    res.online = true;
+    res.json({ message: "sintopia api is up and running!", online: true});
 });
 
 // Error handling
