@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/categories", categoryRoutes);
-app.use("/api/medias", mediaRoutes);
+app.use("/api/media", mediaRoutes);
 app.use("/api/postViews", postViewRoutes);
 app.use("/api/settings",settingsRoutes);
 app.use("/api/tags", tagRoutes);

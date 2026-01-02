@@ -80,15 +80,31 @@ export const setStatus = async (req, res, next) => {
 export const createComment = async (req, res, next) => {
   try {
     const { author, authorEmail, body, postId } = req.body;
+
+    if (postId) { 
+      const postExists = await prisma.post.findUnique({
+        where: { id: postId }
+      });
+
+      if (!postExists) {
+        return res.status(400).json({ error: "Invalid postId" });
+      }
+    }
+
     const comment = await prisma.comment.create({
-      data: { author, authorEmail, body, postId },
+      data: {
+        author,
+        authorEmail,
+        body,
+        postId
+      }
     });
+
     res.status(201).json(comment);
   } catch (err) {
     next(err);
   }
 };
-
 
 export const deleteComment = async (req, res, next) => {
   try {

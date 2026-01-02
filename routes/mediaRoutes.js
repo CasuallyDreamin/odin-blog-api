@@ -5,7 +5,7 @@ import { getAllMedia, getMediaById, createMedia } from "../controllers/mediaCont
 const router = express.Router();
 
 router.get("/", getAllMedia);
-router.get("/:slug", getMediaById);
+router.get("/:id", getMediaById);
 router.post("/", requireAdmin,createMedia);
 
 export default router;

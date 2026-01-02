@@ -1,5 +1,7 @@
 import { prisma } from "../prisma/client.js";
 import { sanitizeHtml } from '../utils/sanitize.js';
+import { Prisma } from "@prisma/client";
+
 export const getQuotes = async (req, res, next) => {
   try {
     const { category, search, page = 1, limit = 10, sort = "desc" } = req.query;
@@ -17,7 +19,7 @@ export const getQuotes = async (req, res, next) => {
     const [quotes, total] = await Promise.all([
       prisma.quote.findMany({
         where: filters,
-        include: { categories: true }, // Include categories
+        include: { categories: true },
         orderBy: { createdAt: sort.toLowerCase() === "asc" ? "asc" : "desc" },
         skip,
         take: parseInt(limit),
@@ -47,7 +49,7 @@ export const createQuote = async (req, res, next) => {
       data: {
         content: safeContent,
         author,
-        categories: { connect: categoryIds.map(id => ({ id })) }, // connect to categories
+        categories: { connect: categoryIds.map(id => ({ id })) },
       },
       include: { categories: true }
     });
@@ -57,11 +59,12 @@ export const createQuote = async (req, res, next) => {
     next(err);
   }
 };
+
 export const getQuoteById = async (req, res, next) => {
   try {
     const quote = await prisma.quote.findUnique({
       where: { id: req.params.id },
-      include: { tags: true }
+      include: { categories: true }
     });
     if (!quote) return res.status(404).json({ error: "Quote not found" });
     res.json(quote);
@@ -73,10 +76,8 @@ export const getQuoteById = async (req, res, next) => {
 export const updateQuote = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { content, author = '', tagIds = [] } = req.body;
+    const { content, author = '', categoryIds = [] } = req.body;
 
-    const exists = await prisma.quote.findUnique({ where: { id }});
-    if (!exists) return res.status(404).json({ error: "Quote not found" });
     if (!content) return res.status(400).json({ error: "Content is required" });
 
     const safeContent = sanitizeHtml(content);
@@ -86,13 +87,16 @@ export const updateQuote = async (req, res, next) => {
       data: {
         content: safeContent,
         author,
-        tags: { set: tagIds.map(id => ({ id })) }
+        categories: { set: categoryIds.map(id => ({ id })) }
       },
-      include: { tags: true }
+      include: { categories: true }
     });
 
     res.status(200).json(updated);
   } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      return res.status(404).json({ error: "Quote not found" });
+    }
     next(err);
   }
 };
@@ -100,12 +104,12 @@ export const updateQuote = async (req, res, next) => {
 export const deleteQuote = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const exists = await prisma.quote.findUnique({ where: { id }});
-    if (!exists) return res.status(404).json({ error: "Quote not found" });
-
-    await prisma.quote.delete({ where: { id }});
+    await prisma.quote.delete({ where: { id } });
     res.status(200).json({ message: "Quote deleted successfully" });
   } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      return res.status(404).json({ error: "Quote not found" });
+    }
     next(err);
   }
 };

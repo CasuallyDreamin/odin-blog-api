@@ -4,7 +4,7 @@ import { getAllPostViews, getPostViewById, createPostView } from "../controllers
 const router = express.Router();
 
 router.get("/", getAllPostViews);
-router.get("/:slug", getPostViewById);
+router.get("/:id", getPostViewById);
 router.post("/", createPostView);
 
 export default router;

@@ -2,18 +2,41 @@ import { prisma } from "../prisma/client.js";
 
 export const getAllPostViews = async (req, res, next) => {
   try {
-    const views = await prisma.postView.findMany();
-    res.json(views);
+    const [totalPosts, totalViews, viewsByDay] = await Promise.all([
+      prisma.post.count(),
+      prisma.postView.count(),
+      prisma.postView.groupBy({
+        by: ['date'],
+        _count: { id: true },
+        orderBy: { date: 'asc' }
+      })
+    ]);
+
+    res.json({
+      totalPosts,
+      totalViews,
+      viewsPerDay: viewsByDay.map(v => ({
+        date: v.date,
+        _count: { id: v._count.id }
+      }))
+    });
   } catch (err) {
     next(err);
   }
 };
-
 export const getPostViewById = async (req, res, next) => {
   try {
-    const view = await prisma.postView.findUnique({ where: { id: req.params.id } });
-    if (!view) return res.status(404).json({ error: "Post view not found" });
-    res.json(view);
+    const { id } = req.params;
+    
+    const views = await prisma.postView.findMany({
+      where: { postId: id }
+    });
+
+    res.json({
+      postId: id,
+      views: views.length,
+      viewsPerDay: [] 
+    });
   } catch (err) {
     next(err);
   }
@@ -21,24 +44,23 @@ export const getPostViewById = async (req, res, next) => {
 
 export const createPostView = async (req, res, next) => {
   try {
-    const { postId, ipHash, userAgent } = req.body;
+    const { postId } = req.body;
 
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const recentView = await prisma.postView.findFirst({
-      where: {
+    if (!postId) {
+      return res.status(400).json({ error: "Post ID is required" });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const newView = await prisma.postView.create({
+      data: {
         postId,
-        ipHash,
-        date: { gte: oneHourAgo },
-      },
+        date: today
+      }
     });
 
-    if (recentView) return res.status(200).json(recentView);
-
-    const view = await prisma.postView.create({
-      data: { postId, ipHash, userAgent },
-    });
-
-    res.status(201).json(view);
+    res.status(201).json(newView);
   } catch (err) {
     next(err);
   }

@@ -15,11 +15,9 @@ const createDefaultSettings = () => {
 export const getSettings = async (req, res, next) => {
   try {
     let settings = await prisma.settings.findUnique({ where: { id: "singleton" } });
-
     if (!settings) {
       settings = await createDefaultSettings();
     }
-
     res.json(settings);
   } catch (err) {
     next(err);
@@ -28,27 +26,17 @@ export const getSettings = async (req, res, next) => {
 
 export const updateSettings = async (req, res, next) => {
   try {
-    const {
-      blogName,
-      tagline,
-      logoUrl,
-      theme,
-      postsPerPage,
-      seoTitle,
-      seoDescription,
-      socialLinks,
-    } = req.body;
-
-    const data = {
-      blogName,
-      tagline,
-      logoUrl,
-      theme,
-      postsPerPage: Number(postsPerPage),
-      seoTitle,
-      seoDescription,
-      socialLinks,
-    };
+    const fields = [
+      'blogName', 'tagline', 'logoUrl', 'theme', 
+      'postsPerPage', 'seoTitle', 'seoDescription', 'socialLinks'
+    ];
+    
+    const data = {};
+    fields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        data[field] = field === 'postsPerPage' ? Number(req.body[field]) : req.body[field];
+      }
+    });
 
     const settings = await prisma.settings.upsert({
       where: { id: "singleton" },
