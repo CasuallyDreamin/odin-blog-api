@@ -75,3 +75,15 @@ export const createTag = async (req, res, next) => {
     next(err);
   }
 };
+
+export const deleteTag = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await prisma.tag.delete({
+      where: { id },
+    });
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
