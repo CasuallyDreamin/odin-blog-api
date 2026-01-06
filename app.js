@@ -27,15 +27,22 @@ const whitelist = process.env.CORS_WHITELIST ? process.env.CORS_WHITELIST.split(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || whitelist.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
+  credentials: true,
+  origin: function (origin, callback) {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.replace(/\/$/, "");
+
+    if (whitelist.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    return callback(null, false);
+  },
 }));
+
 app.use(cookieParser());
 
 app.use("/api/posts", postRoutes);
