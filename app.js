@@ -35,6 +35,8 @@ app.use(cors({
 
     const normalizedOrigin = origin.replace(/\/$/, "");
 
+    console.log("CORS origin:", origin);
+
     if (whitelist.includes(normalizedOrigin)) {
       return callback(null, true);
     }
