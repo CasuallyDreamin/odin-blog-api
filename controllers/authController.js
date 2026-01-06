@@ -35,7 +35,7 @@ export async function login(req, res, next) {
     res.cookie(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
