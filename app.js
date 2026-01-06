@@ -21,15 +21,23 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
+const appName = process.env.APP_NAME || "API";
+const whitelist = process.env.CORS_WHITELIST ? process.env.CORS_WHITELIST.split(',') : [];
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: function (origin, callback) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }));
 app.use(cookieParser());
-// Routes
+
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -43,13 +51,13 @@ app.use("/api/archives", archiveRoutes);
 app.use("/api/auth", authroutes);
 app.use("/api/contact", messageRoutes);
 
-// Health check
 app.get("/api/", (req, res) => {
-    res.online = true;
-    res.json({ message: "sintopia api is up and running!", online: true});
+    res.json({ 
+        message: `${appName} api is up and running!`, 
+        online: true 
+    });
 });
 
-// Error handling
 app.use((err, req, res, next) => {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error"});
