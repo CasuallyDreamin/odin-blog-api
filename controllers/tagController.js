@@ -18,7 +18,6 @@ export const getAllTags = async (req, res, next) => {
       skip: (page - 1) * limit,
       take: limit,
 
-      // TAG HAS NO createdAt — order by name instead
       orderBy: { name: "asc" },
     });
 
