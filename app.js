@@ -15,6 +15,8 @@ import archiveRoutes from './routes/archiveRoutes.js';
 import authroutes from './routes/authRoutes.js';
 import messageRoutes from './routes/contactRoutes.js';
 import statsRoutes from './routes/statsRoutes.js';
+import keepAliveRoutes from './routes/keepAliveRoutes.js';
+
 import cors from "cors";
 
 dotenv.config();
@@ -60,6 +62,7 @@ app.use("/api/archives", archiveRoutes);
 app.use("/api/auth", authroutes);
 app.use("/api/contact", messageRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/keep-alive", keepAliveRoutes);
 
 app.get("/api/", (req, res) => {
     res.json({ 
